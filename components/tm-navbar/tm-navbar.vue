@@ -47,7 +47,7 @@
             <tm-icon
               :unit="props.unit"
               :font-size="props.iconFontSize"
-              _class="pointer pb-12 pt-12 pr-12"
+              _class="pb-12 pt-12 pr-12"
               :color="_homeColor"
               @click="goback"
               v-if="_pages > 1 && props.hideBack"
@@ -55,7 +55,7 @@
             ></tm-icon>
             <tm-icon
               :unit="props.unit"
-              _class="pointer  pb-12 pt-12 pr-12"
+              _class="pb-12 pt-12 pr-12"
               @click="backhome"
               v-if="_pages == 1 && !hideHome"
               :color="_homeColor"
