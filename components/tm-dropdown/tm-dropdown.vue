@@ -52,7 +52,7 @@
 				]"
 				ref="content"
 				>
-					<tm-translate ref="aniDom" reverse :name="tarnslateName" :duration="120" :autoPlay="!isNvue">
+					<tm-translate ref="aniDom" reverse :name="tarnslateName" :duration="180" :autoPlay="!isNvue">
 						<view class="flex flex-col " :class="[
 							props.position=='tc'?'flex-col-center-center':'',
 							props.position=='tl'?'flex-col-top-start':'',
@@ -251,7 +251,7 @@
 	const dom = uni.requireNativePlugin('dom')
 	// #endif
 	const emits = defineEmits(['click'])
-	const {proxy} = getCurrentInstance();
+	const proxy = getCurrentInstance()?.proxy??null;
 	const aniDom = ref<InstanceType<typeof tmTranslate> | null>(null)
 	const props = defineProps({
 		...custom_props,
@@ -298,7 +298,7 @@
 	})
 	const info = uni.getSystemInfoSync();
 	const windowWidth = ref(info.windowWidth)
-	const windowHeight = ref(info.safeArea.height)
+	const windowHeight = ref(info?.safeArea?.height??info.windowHeight)
 	let isNvue = ref(false)
 	// #ifdef APP-PLUS-NVUE
 	isNvue.value =true;
