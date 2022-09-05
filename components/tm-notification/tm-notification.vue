@@ -129,24 +129,11 @@ import { showOpts } from "./interface";
 			default:'tmicon-info-circle-fill'
 		}
 	})
-	const { windowTop,windowBottom ,windowWidth } = uni.getSystemInfoSync();
-	
-		let nowPage = getCurrentPages().pop()
-	// 本页面是否定义了头部的原生导航
-	let isCustomHeader = false;
-	for(let i=0;i<uni.$tm.pages.length;i++){
-		if(nowPage?.route==uni.$tm.pages[i].path&&uni.$tm.pages[i].custom=='custom'){
-			isCustomHeader = true;
-			break;
-		}
-	}
-
+	const sysinfo = inject("tmuiSysInfo",{bottom:0,height:750,width:uni.upx2px(750),top:0,isCustomHeader:false,sysinfo:null})
+	let windowBottom = sysinfo.bottom;
+	let windowTop = sysinfo.top;
+	let windowWidth = sysinfo.width;
 	const p_top = ref(windowTop||0)
-	if(isCustomHeader){
-		p_top.value=44
-	}else{
-		p_top.value=0
-	}
 	const p_bottom = ref(windowBottom||0)
 	const p_width = ref(windowWidth||0)
 	const timeid = ref(uni.$tm.u.getUid(5))

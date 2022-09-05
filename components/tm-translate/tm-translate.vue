@@ -266,8 +266,8 @@
 							element: elDom,
 							property: 'transform.scale',
 							expression: computedReverse.value ?
-								`linear(t,1,-0.7,${durationtos.value})` :
-								`linear(t,0.7,0.3,${durationtos.value})`
+								`linear(t,1,-0.2,${durationtos.value})` :
+								`linear(t,0.8,0.2,${durationtos.value})`
 						},
 						{
 							element: elDom,
@@ -303,7 +303,6 @@
 	function noNvueAmations() {
 
 		animationData.value = null;
-		
 		//复位。
 		nextTick(function() {
 			var animation = uni.createAnimation({
@@ -320,26 +319,26 @@
 				});
 			} else if (animationName.value == 'up') {
 				let opacity = computedReverse.value ? '-101%' : '0%';
-				animation.translateY(opacity).step({
+				animation.translateY(opacity).opacity(1).step({
 					duration: 0
 				});
 			} else if (animationName.value == 'down') {
 				let opacity = computedReverse.value ? '101%' : '0%';
-				animation.translateY(opacity).step({
+				animation.translateY(opacity).opacity(1).step({
 					duration: 0
 				});
 			} else if (animationName.value == 'left') {
 				let opacity = computedReverse.value ? '-101%' : '0%';
-				animation.translateX(opacity).step({
+				animation.translateX(opacity).opacity(1).step({
 					duration: 0
 				});
 			} else if (animationName.value == 'right') {
 				let opacity = computedReverse.value ? '101%' : '0';
-				animation.translateX(opacity).step({
+				animation.translateX(opacity).opacity(1).step({
 					duration: 0
 				});
 			} else if (animationName.value == 'zoom') {
-				let scale = computedReverse.value ? [1, 1] : [0.7, 0.7];
+				let scale = computedReverse.value ? [1, 1] : [0.8, 0.8];
 				let opacity = computedReverse.value ? 1 : 0;
 				animation.scale(...scale).opacity(opacity).step({
 					duration: 0
@@ -356,18 +355,18 @@
 					animation.opacity(opacity).step();
 				} else if (animationName.value == 'up') {
 					let opacity = computedReverse.value ? '0%' : '-101%';
-					animation.translateY(opacity).step();
+					animation.translateY(opacity).opacity(1).step();
 				} else if (animationName.value == 'down') {
 					let opacity = computedReverse.value ? '0%' : '101%';
-					animation.translateY(opacity).step();
+					animation.translateY(opacity).opacity(1).step();
 				} else if (animationName.value == 'left') {
 					let opacity = computedReverse.value ? '0%' : '-101%';
-					animation.translateX(opacity).step();
+					animation.translateX(opacity).opacity(1).step();
 				} else if (animationName.value == 'right') {
 					let opacity = computedReverse.value ? '0' : '101%';
-					animation.translateX(opacity).step();
+					animation.translateX(opacity).opacity(1).step();
 				} else if (animationName.value == 'zoom') {
-					let scale = computedReverse.value ? [0.7, 0.7] : [1, 1];
+					let scale = computedReverse.value ? [0.8, 0.8] : [1, 1];
 					let opacity = computedReverse.value ? 0 : 1;
 					animation.scale(...scale).opacity(opacity).step();
 				}
@@ -379,7 +378,7 @@
 					emits('end');
 					animationStatus.value = 2;
 				}, durationtos.value)
-			}, detalTime)
+			}, 50)
 		})
 	}
 </script>
@@ -426,7 +425,7 @@
 	}
 
 	.zoom {
-		transform: scale(0.7, 0.7);
+		transform: scale(0.8, 0.8);
 		opacity: 0;
 	}
 

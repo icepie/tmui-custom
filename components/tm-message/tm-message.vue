@@ -1,6 +1,6 @@
 <template>
-	<tm-overlay blur :duration="0" :transprent="!showMask"  :_style="zindex" :overlayClick="false" v-if="showValue" v-model:show="showValue">
-		<tm-translate :initByWechat="initByWechat" @end="msgOver" :reverse="reverse" ref="tranAni" name="zoom" :duration="160" :auto-play="false">
+	<tm-overlay v-if="showMask" ref="Overlay" @open="overlayOpen" @close="msgOver"  :duration="230" :transprent="!showMask"  :_style="zindex" :overlayClick="false" v-model:show="showValue">
+		<tm-translate :initByWechat="initByWechat"  :reverse="reverse" ref="tranAni" name="zoom" :duration="150" :auto-play="false">
 			<tm-sheet blur :_style="props._style"  
 			:_class="props._class" :color="bgColor" 
 			:border="1" :shadow="10" 
@@ -33,6 +33,7 @@
 	import { getCurrentInstance, computed, ref, provide, inject, ComponentInternalInstance, onUnmounted, nextTick ,watch, Ref } from 'vue';
 	const store = useTmpiniaStore();
 	const tranAni  = ref<InstanceType<typeof tmTranslate> | null>(null)
+	const Overlay  = ref<InstanceType<typeof tmOverlay> | null>(null)
 	const emits = defineEmits(['click'])
 	const proxy = getCurrentInstance()?.proxy??null;
 	const props = defineProps({
@@ -125,13 +126,7 @@
 	function msgOver(){
 			tranAni.value?.stop()
 			tranAni.value?.reset()
-			clearTimeout(uid.value)
-			uid.value = setTimeout(function() {
-				if (dur.value > 0 && model_ref.value != 'load'){
-					reverse.value = false;
-					showValue.value= false;
-				}
-			}, dur.value);
+			
 	}
 		//显示
 	function show(argFs:config) {
@@ -158,12 +153,30 @@
 			duration = props.duration;
 		}
 		dur.value = isNaN(parseInt(String(duration))) ? 1500 : parseInt(String(duration));
-		// initByWechat.value = !initByWechat.value;
 		reverse.value = false;
 		showValue.value = true;
-		setTimeout(()=>{
+	}
+	
+	function overlayOpen(){
+		reverse.value = false;
+		nextTick(()=>{
+			tranAni.value?.stop()
+			tranAni.value?.reset()
 			tranAni.value?.play()
-		},80)
+			clearTimeout(uid.value)
+			uid.value = setTimeout(function() {
+				if (dur.value > 0 && model_ref.value != 'load'){
+					reverse.value = true;
+					showValue.value= false;
+					tranAni.value?.stop()
+					tranAni.value?.reset()
+					nextTick(()=>{
+						
+						tranAni.value?.play()
+					})
+				}
+			}, dur.value);
+		})
 	}
 
 	

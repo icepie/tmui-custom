@@ -1,10 +1,10 @@
 <template>
-    <tm-sheet :margin="props.margin" :padding="props.padding" :transprent="tmFormTransprent" >
+    <tm-sheet :transprent="tmFormTransprent" :margin="props.margin" :padding="props.padding"  >
         <view :class="['flex',tmFormLayout=='horizontal'?'flex-row flex-row-center-start':'flex-col']">
 			<view v-if="_label" :style="[{width:tmFormLabelWidth+'rpx'}]" class="mr-32 flex flex-row" 
             :class="[tmFormLabelAlign=='right'?'flex-row-center-end':'',tmFormLayout!='horizontal'?'mb-24':'']">
 				<tm-text v-if="_required" color="red" :font-size="30" label="*"></tm-text>
-				<tm-text :color="tmFormFun=='validate'&&item.isRequiredError==true?'red':''" :font-size="30" :label="_label"></tm-text>
+				<tm-text :color="tmFormFun=='validate'&&item.isRequiredError==true&&props.requiredTitleChangeColor?'red':''" :font-size="30" :label="_label"></tm-text>
 			</view>
 			<view class="flex-1" :style="[tmFormLayout=='horizontal'?{width: '0px'}:'']">
 			    <view>
@@ -79,6 +79,11 @@ const props = defineProps({
 	showError:{
 		type:Boolean,
 		default:true
+	},
+	//校验不通过时，是否让标题跟着变化文字颜色，默认是。
+	requiredTitleChangeColor:{
+		type:Boolean,
+		default:true
 	}
 	
 })
@@ -96,7 +101,8 @@ const tmFormLabelWidth = inject("tmFormLabelWidth",computed(()=>100))
 const tmFormLabelAlign = inject("tmFormLabelAlign",computed(()=>"left"))
 const tmFormLayout = inject("tmFormLayout",computed(()=>"horizontal"))
 const tmFormBorder_inject = inject("tmFormBorder",computed(()=>true))
-const tmFormTransprent = inject("tmFormTransprent", computed(() => false))
+const tmFormTransprent = inject("tmFormTransprent",computed(()=>false))
+
 const tmFormBorder = computed(()=>{
     if(props.border!==null&&typeof props.border === 'boolean') return props.border;
     return tmFormBorder_inject.value
