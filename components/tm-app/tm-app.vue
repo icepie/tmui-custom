@@ -154,7 +154,7 @@ const props = defineProps({
   },
   showMenu: {
     type: Boolean,
-    default: true,
+    default: false,
   },
 });
 // 设置响应式全局组件库配置表。
