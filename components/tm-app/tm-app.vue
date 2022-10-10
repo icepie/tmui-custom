@@ -154,7 +154,7 @@ const props = defineProps({
   },
   showMenu: {
     type: Boolean,
-    default: false,
+    default: true,
   },
 });
 // 设置响应式全局组件库配置表。
@@ -243,8 +243,24 @@ function throttle(func: Function, wait = 100, immediate = false) {
 function setAppStyle() {
   if (isDark.value) {
     appConfig.value.theme = props.darkColor;
+    uni.setNavigationBarColor({
+      backgroundColor: appConfig.value.theme,
+      frontColor: "#ffffff",
+      animation: {
+        duration: 400,
+        timingFunc: "easeIn",
+      },
+    });
   } else {
     appConfig.value.theme = tmcomputed.value.backgroundColor;
+    uni.setNavigationBarColor({
+      backgroundColor: props.navbar.background,
+      frontColor: props.navbar.fontColor,
+      animation: {
+        duration: 400,
+        timingFunc: "easeIn",
+      },
+    });
   }
   // #ifdef MP-WEIXIN || MP-BAIDU || MP-QQ || MP-KUAISHOU || MP-LARK
   uni.setBackgroundColor({
@@ -293,39 +309,6 @@ function setAppStyle() {
     })
   );
   // #endif
-
-  if (isDark.value) {
-    // if (!sysinfo.isCustomHeader) {
-    uni.setNavigationBarColor({
-      backgroundColor: appConfig.value.theme,
-      frontColor: "#ffffff",
-    });
-    // }
-
-    // if (isTabbarPage) {
-    //   uni.setTabBarStyle({
-    //     backgroundColor: "#000000",
-    //     borderStyle: "#1a1a1a",
-    //     color: "#ffffff",
-    //     selectedColor: uni.$tm.tabBar.selectedColor || tmcomputed.value.textColor,
-    //   });
-    // }
-  } else {
-    // if (!sysinfo.isCustomHeader) {
-    uni.setNavigationBarColor({
-      backgroundColor: props.navbar.background,
-      frontColor: props.navbar.fontColor,
-    });
-    // }
-    // if (isTabbarPage) {
-    //   uni.setTabBarStyle({
-    //     backgroundColor: uni.$tm.tabBar.backgroundColor || props.navbar.background,
-    //     borderStyle: uni.$tm.tabBar.borderStyle || "#888888",
-    //     color: uni.$tm.tabBar.color || props.navbar.fontColor,
-    //     selectedColor: uni.$tm.tabBar.selectedColor || tmcomputed.value.textColor,
-    //   });
-    // }
-  }
   isSetThemeOk.value = true;
 }
 
