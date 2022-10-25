@@ -228,12 +228,12 @@ const _fontColor = computed(() => props.fontColor);
 const _homeColor = computed(() => props.homeColor);
 const _blur = computed(() => props.blur);
 const _pages = computed(() => getCurrentPages().length);
-onMounted(async () => {
-  _pages.value = getCurrentPages().length;
-  // if (props.hideBack) {
-  //   _pages.value = 0;
-  // }
-});
+// onMounted(async () => {
+//   _pages.value = getCurrentPages().length;
+//   // if (props.hideBack) {
+//   //   _pages.value = 0;
+//   // }
+// });
 
 const backhome = () => {
   uni.reLaunch({
