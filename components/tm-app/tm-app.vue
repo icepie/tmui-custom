@@ -309,13 +309,22 @@ function setAppStyle() {
     plus.navigator.setStatusBarStyle("light");
     // #endif
 
+    uni.setNavigationBarColor({
+      backgroundColor: "#050505",
+      frontColor: "#ffffff",
+      animation: {
+        duration: 400,
+        timingFunc: "easeIn",
+      },
+    });
+
     // if (isTabbarPage) {
-    // 	uni.setTabBarStyle({
-    // 		backgroundColor: '#000000',
-    // 		borderStyle: '#1a1a1a',
-    // 		color: '#ffffff',
-    // 		selectedColor: uni.$tm.tabBar.selectedColor || tmcomputed.value.textColor
-    // 	})
+    //   uni.setTabBarStyle({
+    //     backgroundColor: "#000000",
+    //     borderStyle: "black",
+    //     color: "#ffffff",
+    //     selectedColor: uni.$tm.tabBar.selectedColor || tmcomputed.value.textColor,
+    //   });
     // }
   } else {
     // #ifndef MP-ALIPAY
@@ -355,13 +364,36 @@ function setAppStyle() {
     // #ifdef APP
     plus.navigator.setStatusBarStyle("dark");
     // #endif
+
+    uni.setNavigationBarColor({
+      backgroundColor: "#ffffff",
+      frontColor: "#000000",
+      animation: {
+        duration: 400,
+        timingFunc: "easeIn",
+      },
+    });
+
     // if (isTabbarPage) {
-    // 	uni.setTabBarStyle({
-    // 		backgroundColor: uni.$tm.tabBar.backgroundColor || props.navbar.background,
-    // 		borderStyle: uni.$tm.tabBar.borderStyle || '#888888',
-    // 		color: uni.$tm.tabBar.color || props.navbar.fontColor,
-    // 		selectedColor: uni.$tm.tabBar.selectedColor || tmcomputed.value.textColor
-    // 	}).catch(e=>{})
+    //   uni
+    //     .setTabBarStyle({
+    //       backgroundColor: "#ffffff",
+    //       borderStyle: "white",
+    //       color: "#000000",
+    //       selectedColor: tmcomputed.value.textColor,
+    //     })
+    //     .catch((e) => {
+    //       console.log(e);
+    //     });
+
+    //   //   uni
+    //   //     .setTabBarStyle({
+    //   //       backgroundColor: uni.$tm.tabBar.backgroundColor || props.navbar.background,
+    //   //       borderStyle: "black",
+    //   //       color: uni.$tm.tabBar.color || props.navbar.fontColor,
+    //   //       selectedColor: uni.$tm.tabBar.selectedColor || tmcomputed.value.textColor,
+    //   //     })
+    //   //     .catch((e) => {});
     // }
   }
   isSetThemeOk.value = true;
