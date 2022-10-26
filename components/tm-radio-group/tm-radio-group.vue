@@ -51,12 +51,19 @@ const _align = computed(()=>{
 		center:'flex-row-center-center',
 		right:'flex-row-center-end',
 	}
-	return list[props.align]
+	let listCol = {
+		left:'flex-col-center-start',
+		center:'flex-col-center-center',
+		right:'flex-col-center-end',
+	}
+	return props.direction=='row'?list[props.align]:listCol[props.align]
 })
+
 //组件唯一标识。
 const checkBoxkeyId = 'tmRadioBoxGroup';
 watch(()=>props.modelValue,()=>{
     _mValue.value = props.modelValue;
+	pushFormItem()
 },{deep:true})
 function pushKey(key:string|number|boolean){
     _cacheBoxList.push(key);
@@ -148,7 +155,6 @@ const validate =(rules:Array<rulesItem>)=>{
 async function pushFormItem(isCheckVail = true){
     if (parentFormItem) {
         if (isCheckVail) {
-            
             validate(toRaw(rulesObj.value)).then(ev => {
                 parentFormItem?.pushCom({
                     value: _mValue.value,

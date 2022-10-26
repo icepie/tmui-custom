@@ -55,7 +55,7 @@ const props = defineProps({
 	},
 	spin: {
 		type: [Boolean],
-		defalut: true
+		default: false
 	},
 	unit: {
 		type: String,
@@ -131,14 +131,16 @@ const prefx = computed(() => {
 });
 //图标名称。
 const iconComputed = computed(() => {
-	if(isImg.value) return props.name //修复不显示图片
+	if(isImg.value) return props.name
 	// #ifdef APP-NVUE
 	let name = props.name.substr(props.name.indexOf('-') + 1)
+	
 	let index = uni.$tm.tmicon.findIndex(el=>el.font==prefx.value)
 	let itemIcon = uni.$tm.tmicon[index].fontJson.find((item, index) => {
 		return item.font_class == name;
 	});
 	if (itemIcon) {
+		
 		return JSON.parse('"\\u' + String(itemIcon.unicode) + '"');
 	}
 	// #endif
@@ -162,18 +164,18 @@ function spinNvueAni(jiaodu=360) {
 			transform: `rotate(${jiaodu}deg)`,
 			transformOrigin: 'center center'
 		},
-		duration: 1200, //ms
+		duration: 2000, //ms
 		timingFunction: 'linear',
 		delay: 0 //ms
 	},()=>{
 		nextTick(function () {
 			animation.transition(iconEl, {
 				styles: {
-					transform: `rotate(${0}deg)`,
+					transform: `rotate(0deg)`,
 					transformOrigin: 'center center'
 				},
 				duration: 0, //ms
-				timingFunction: 'linear',
+				timingFunction: 'ease',
 				delay: 0 //ms
 			},()=>{
 				spinNvueAni()

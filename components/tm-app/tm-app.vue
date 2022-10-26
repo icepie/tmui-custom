@@ -147,8 +147,8 @@ const props = defineProps({
     }>,
     default: () => {
       return {
-        background: "#ffffff",
-        fontColor: "#000000",
+        background: "",
+        fontColor: "",
       };
     },
   },
@@ -243,24 +243,8 @@ function throttle(func: Function, wait = 100, immediate = false) {
 function setAppStyle() {
   if (isDark.value) {
     appConfig.value.theme = props.darkColor;
-    uni.setNavigationBarColor({
-      backgroundColor: appConfig.value.theme,
-      frontColor: "#ffffff",
-      animation: {
-        duration: 400,
-        timingFunc: "easeIn",
-      },
-    });
   } else {
     appConfig.value.theme = tmcomputed.value.backgroundColor;
-    uni.setNavigationBarColor({
-      backgroundColor: props.navbar.background,
-      frontColor: props.navbar.fontColor,
-      animation: {
-        duration: 400,
-        timingFunc: "easeIn",
-      },
-    });
   }
   // #ifdef MP-WEIXIN || MP-BAIDU || MP-QQ || MP-KUAISHOU || MP-LARK
   uni.setBackgroundColor({
@@ -309,6 +293,77 @@ function setAppStyle() {
     })
   );
   // #endif
+
+  if (isDark.value) {
+    // #ifndef MP-ALIPAY
+    if (!sysinfo.isCustomHeader) {
+      uni.setNavigationBarColor({
+        backgroundColor: appConfig.value.theme,
+        frontColor: "#ffffff",
+      });
+    }
+
+    // #endif
+
+    // #ifdef APP
+    plus.navigator.setStatusBarStyle("light");
+    // #endif
+
+    // if (isTabbarPage) {
+    // 	uni.setTabBarStyle({
+    // 		backgroundColor: '#000000',
+    // 		borderStyle: '#1a1a1a',
+    // 		color: '#ffffff',
+    // 		selectedColor: uni.$tm.tabBar.selectedColor || tmcomputed.value.textColor
+    // 	})
+    // }
+  } else {
+    // #ifndef MP-ALIPAY
+    if (!sysinfo.isCustomHeader) {
+      let nowPageConfigs = uni.$tm.pages.filter((el) => el.path == nowPage?.route);
+      if (nowPageConfigs.length > 0 && !props.navbar.background) {
+        let tcolor = nowPageConfigs[0].navigationBarTextStyle;
+        tcolor = tcolor.toLocaleLowerCase();
+        tcolor = tcolor == "black" ? "#000000" : tcolor;
+        tcolor = tcolor == "white" ? "#ffffff" : tcolor;
+        uni.setNavigationBarColor({
+          backgroundColor: nowPageConfigs[0].navigationBarBackgroundColor,
+          frontColor: tcolor,
+        });
+        uni.setStorageSync(
+          "tmuiNavStyle",
+          JSON.stringify({
+            navbarBackground: nowPageConfigs[0].navigationBarBackgroundColor,
+            navbarFontColor: tcolor,
+          })
+        );
+      } else {
+        uni.setNavigationBarColor({
+          backgroundColor: props.navbar.background,
+          frontColor: props.navbar.fontColor,
+        });
+        uni.setStorageSync(
+          "tmuiNavStyle",
+          JSON.stringify({
+            navbarBackground: props.navbar.background,
+            navbarFontColor: props.navbar.fontColor,
+          })
+        );
+      }
+    }
+    // #endif
+    // #ifdef APP
+    plus.navigator.setStatusBarStyle("dark");
+    // #endif
+    // if (isTabbarPage) {
+    // 	uni.setTabBarStyle({
+    // 		backgroundColor: uni.$tm.tabBar.backgroundColor || props.navbar.background,
+    // 		borderStyle: uni.$tm.tabBar.borderStyle || '#888888',
+    // 		color: uni.$tm.tabBar.color || props.navbar.fontColor,
+    // 		selectedColor: uni.$tm.tabBar.selectedColor || tmcomputed.value.textColor
+    // 	}).catch(e=>{})
+    // }
+  }
   isSetThemeOk.value = true;
 }
 
@@ -335,6 +390,7 @@ function setDark(dark?: boolean) {
   }
   appConfig.value.dark = maindark;
   store.setTmVuetifyDark(maindark);
+  setAppStyle();
 }
 
 //向ref外层公开本组件的特定方法。

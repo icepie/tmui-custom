@@ -31,7 +31,7 @@
  * 级联选择（弹层）
  * @description 这是弹出式级联
  */
-import { PropType, Ref, ref, watchEffect,getCurrentInstance, computed, toRaw ,inject } from "vue"
+import { PropType, Ref, ref, watchEffect,onMounted,getCurrentInstance, computed, toRaw ,inject, nextTick, watch } from "vue"
 import { custom_props } from "../../tool/lib/minxs";
 import tmDrawer from '../tm-drawer/tm-drawer.vue';
 import { columnsItem } from "../tm-picker-view/interface"
@@ -143,24 +143,42 @@ const sysinfo = inject("tmuiSysInfo",computed(()=>{
 watchEffect(() => {
     showCity.value = props.show
 })
+watch(()=>props.modelValue,()=>{
+	// _colIndex.value = props.modelValue
+    getIndexBymodel(_data.value, props.selectedModel, 0, props.modelValue)
+    defaultModerStrGet()
+},{deep:true})
+watch(()=>props.columns,()=>{
+    getIndexBymodel(_data.value, props.selectedModel, 0, props.modelValue)
+},{deep:true})
 function closeDrawer(e: boolean) {
     showCity.value = e;
     emits('update:show', showCity.value)
     getIndexBymodel(_data.value, props.selectedModel, 0, props.modelValue)
     emits("close")
+	
 }
 //弹层打开时触发。
 function drawerOpen(){
     emits("open")
 }
-getIndexBymodel(_data.value, props.selectedModel, 0, props.defaultValue)
-setVal()
+onMounted(()=>{
+	// getIndexBymodel(_data.value, props.selectedModel, 0, props.defaultValue)
+	if(props.defaultValue.length>0){
+		getIndexBymodel(_data.value, props.selectedModel, 0, props.defaultValue)
+		defaultModerStrGet()
+	}
+})
 //点击确认了地区。
 function confirm() {
     // if (!aniover.value) return
+    if(_colIndex.value.length==0){
+        getIndexBymodelByEmptyOnConfirm(_data.value, props.selectedModel, 0, props.defaultValue)
+    }
     setVal();
     emits("confirm", toRaw(_colIndex.value))
     drawer.value?.close();
+
 }
 function cancel() {
      if (!aniover.value) return
@@ -178,24 +196,41 @@ function setVal() {
     emits("update:modelValue", val)
     emits("update:modelStr", _colStr.value)
 }
+function defaultModerStrGet(){
+    if(!_colStr.value&&_colIndex.value.length>0){
+        let text = getRouterText(_data.value,0);
+        emits("update:modelStr",text.join("/"))
+    }
+	if(_colIndex.value.length==0){
+		emits("update:modelStr","")
+	}
+}
 //模拟模型来返回index值
 function getIndexBymodel(vdata:Array<columnsItem> = [], model = "name", parentIndex:number= 0, value:Array<number|string> = []): Array<number> {
-    if (model == 'name') {
+	
+    if(value.length==0){
+		_colIndex.value = [];
+		return [];
+	}
+    let p_colIndex = [... _colIndex.value]
+	_colIndex.value = []
+	if (model == 'name') {
         let item = vdata.filter(el => value[parentIndex] == el['text'])
         if (item.length == 0) {
-            item = vdata[0];
-            if (item) {
-                value[parentIndex] = item['text'];
-                _colIndex.value[parentIndex] = 0
-                if (item['children']) {
-                    getIndexBymodel(item['children'], model, parentIndex + 1, value);
-                }
-            }
+            //    如果不存在,不再默认选中第一个,2022年10月14日修改
+            // item = vdata[0];
+            // if (item) {
+            //     value[parentIndex] = item['text'];
+            //     p_colIndex[parentIndex] = 0
+            //     if (item['children']) {
+            //         getIndexBymodel(item['children'], model, parentIndex + 1, value);
+            //     }
+            // }
 
         } else {
             item = item[0];
             if (item) {
-                _colIndex.value[parentIndex] = vdata.findIndex(el => el['text'] == item['text'])
+                p_colIndex[parentIndex] = vdata.findIndex(el => el['text'] == item['text'])
                 if (item['children']) {
                     getIndexBymodel(item['children'], model, parentIndex + 1, value);
                 }
@@ -204,10 +239,45 @@ function getIndexBymodel(vdata:Array<columnsItem> = [], model = "name", parentIn
     } else if (model == 'id') {
         let item = vdata.filter(el => value[parentIndex] == el['id'])
         if (item.length == 0) {
+            //    如果不存在,不再默认选中第一个,2022年10月14日修改
+            // item = vdata[0];
+            // if (item) {
+            //     value[parentIndex] = item['id'];
+            //     p_colIndex[parentIndex] = 0
+            //     if (item['children']) {
+            //         getIndexBymodel(item['children'], model, parentIndex + 1, value);
+            //     }
+            // }
+
+        } else {
+            item = item[0];
+            if (item) {
+               
+                p_colIndex[parentIndex] = vdata.findIndex(el => el['id'] == item['id'])
+                if (item['children']) {
+                    getIndexBymodel(item['children'], model, parentIndex + 1, value);
+                }
+            }
+        }
+    }else{
+		p_colIndex = [...value]
+	}
+	_colIndex.value = [...p_colIndex]
+    return _colIndex.value;
+}
+// 和上方一样的功能,区别是,当什么都不选的时候,点了确认,就要默认选中第一行数据.
+function getIndexBymodelByEmptyOnConfirm(vdata:Array<columnsItem> = [], model = "name", parentIndex:number= 0, value:Array<number|string> = []): Array<number> {
+	
+    let p_colIndex = [... _colIndex.value]
+	_colIndex.value = []
+	if (model == 'name') {
+        let item = vdata.filter(el => value[parentIndex] == el['text'])
+        if (item.length == 0) {
+            //    如果不存在,不再默认选中第一个,2022年10月14日修改
             item = vdata[0];
             if (item) {
-                value[parentIndex] = item['id'];
-                _colIndex.value[parentIndex] = 0
+                value[parentIndex] = item['text'];
+                p_colIndex[parentIndex] = 0
                 if (item['children']) {
                     getIndexBymodel(item['children'], model, parentIndex + 1, value);
                 }
@@ -216,16 +286,39 @@ function getIndexBymodel(vdata:Array<columnsItem> = [], model = "name", parentIn
         } else {
             item = item[0];
             if (item) {
-                _colIndex.value[parentIndex] = vdata.findIndex(el => el['id'] == item['id'])
+                p_colIndex[parentIndex] = vdata.findIndex(el => el['text'] == item['text'])
+                if (item['children']) {
+                    getIndexBymodel(item['children'], model, parentIndex + 1, value);
+                }
+            }
+        }
+    } else if (model == 'id') {
+        let item = vdata.filter(el => value[parentIndex] == el['id'])
+        if (item.length == 0) {
+            //    如果不存在,不再默认选中第一个,2022年10月14日修改
+            item = vdata[0];
+            if (item) {
+                value[parentIndex] = item['id'];
+                p_colIndex[parentIndex] = 0
+                if (item['children']) {
+                    getIndexBymodel(item['children'], model, parentIndex + 1, value);
+                }
+            }
+
+        } else {
+            item = item[0];
+            if (item) {
+               
+                p_colIndex[parentIndex] = vdata.findIndex(el => el['id'] == item['id'])
                 if (item['children']) {
                     getIndexBymodel(item['children'], model, parentIndex + 1, value);
                 }
             }
         }
     }else{
-		_colIndex.value = [...value]
+		p_colIndex = [...value]
 	}
-
+	_colIndex.value = [...p_colIndex]
     return _colIndex.value;
 }
 //返回 一个节点从父到子的路径id组。
@@ -236,6 +329,21 @@ function getRouterId(list = [], parentIndex = 0): Array<string | number> {
             p.push(list[i]['id'])
             if (typeof _colIndex.value[parentIndex] != 'undefined') {
                 let c = getRouterId(list[i]['children'], parentIndex + 1)
+                p = [...p, ...c]
+            }
+            break;
+        }
+    }
+    return p
+}
+//返回 一个节点从父到子的路径text组。
+function getRouterText(list:Array<childrenData>  = [], parentIndex = 0): Array<string | number> {
+    let p: Array<string | number> = [];
+    for (let i = 0; i < list.length; i++) {
+        if (i == _colIndex.value[parentIndex]) {
+            p.push(list[i]['text'])
+            if (typeof _colIndex.value[parentIndex] != 'undefined') {
+                let c = getRouterText(list[i]['children'], parentIndex + 1)
                 p = [...p, ...c]
             }
             break;

@@ -44,7 +44,7 @@ const props = defineProps({
     //默认选中的索引值。
 	defaultValue:{
 		type:Array as PropType<Array<number>>,
-		default:()=>[0]
+		default:()=>[]
 	},
     columns:{
         type:Array as PropType<Array<columnsItem>>,
